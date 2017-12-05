@@ -13,6 +13,7 @@ import net.ericsson.emovs.utilities.emp.EMPRegistry;
 import net.ericsson.emovs.utilities.interfaces.IPlayable;
 import net.ericsson.emovs.utilities.models.EmpAsset;
 import net.ericsson.emovs.utilities.models.EmpChannel;
+import net.ericsson.emovs.utilities.models.EmpImage;
 import net.ericsson.emovs.utilities.models.EmpProgram;
 
 /**
@@ -122,19 +123,34 @@ public class EMPCastProvider {
 
     private MediaInfo buildMediaInfo(IPlayable playable) {
         MediaMetadata movieMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
-
-        // TODO: put movie metadata! :)
-        //movieMetadata.putString(MediaMetadata.KEY_TITLE, "Batman");
-        //movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, "Bad blood");
-        //movieMetadata.addImage(new WebImage(Uri.parse("http://emp.ebsf.fr/MEDIA/batman.png")));
-
         MediaInfo.Builder builder;
+        String locale = EMPRegistry.locale();
 
         if (playable instanceof EmpAsset || playable instanceof EmpProgram) {
-            builder = new MediaInfo.Builder(((EmpAsset) playable).assetId);
+            EmpAsset asset = (EmpAsset) playable;
+            movieMetadata.putString(MediaMetadata.KEY_TITLE, asset.localized.getTitle(locale));
+            movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, asset.localized.getDescriptions(locale));
+
+            EmpImage image = asset.localized.getImage(locale, EmpImage.Orientation.LANDSCAPE);
+            if (image != null && image.url != null) {
+                movieMetadata.addImage(new WebImage(Uri.parse(image.url)));
+            }
+
+            builder = new MediaInfo.Builder(asset.assetId);
         }
         else if (playable instanceof EmpChannel) {
-            builder = new MediaInfo.Builder(((EmpChannel) playable).channelId);
+            EmpChannel channel = (EmpChannel) playable;
+
+            movieMetadata.putString(MediaMetadata.KEY_TITLE, channel.localized.getTitle(locale));
+            movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, channel.localized.getDescriptions(locale));
+
+            EmpImage image = channel.localized.getImage(locale, EmpImage.Orientation.LANDSCAPE);
+            if (image != null && image.url != null) {
+
+                movieMetadata.addImage(new WebImage(Uri.parse(image.url)));
+            }
+
+            builder = new MediaInfo.Builder(channel.channelId);
         }
         else {
             return null;
