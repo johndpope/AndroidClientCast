@@ -41,7 +41,7 @@ public class EMPCastProvider {
     }
 
     // TODO: missing to pass castProperties
-    public void startCasting(IPlayable playable) {
+    public void startCasting(IPlayable playable, final Runnable onReady) {
         if (this.getCastSession() == null) {
             // TODO: return error
             return;
@@ -56,6 +56,9 @@ public class EMPCastProvider {
         remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
             @Override
             public void onStatusUpdated() {
+                if (onReady != null) {
+                    onReady.run();
+                }
                 empReceiverChannel.refreshControls();
 
                 // Chromecast API does not handle this well, se we are using a custom message for now.
