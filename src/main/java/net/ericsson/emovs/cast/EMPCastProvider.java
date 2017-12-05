@@ -21,7 +21,6 @@ import net.ericsson.emovs.utilities.models.EmpProgram;
 
 public class EMPCastProvider {
     private CastContext castContext;
-    private CastSession castSession;
     private EmpReceiverChannel empReceiverChannel;
 
     private static class EMPCastProviderHolder {
@@ -34,18 +33,21 @@ public class EMPCastProvider {
 
     public EMPCastProvider() {
         this.castContext = CastContext.getSharedInstance(EMPRegistry.applicationContext());
-        this.castSession = this.castContext.getSessionManager().getCurrentCastSession();
         this.empReceiverChannel = EmpReceiverChannel.getSharedInstance(this.castContext);
+    }
+
+    public CastSession getCastSession() {
+        return this.castContext.getSessionManager().getCurrentCastSession();
     }
 
     // TODO: missing to pass castProperties
     public void startCasting(IPlayable playable) {
-        if (this.castSession == null) {
+        if (this.getCastSession() == null) {
             // TODO: return error
             return;
         }
 
-        final RemoteMediaClient remoteMediaClient = this.castSession.getRemoteMediaClient();
+        final RemoteMediaClient remoteMediaClient = this.getCastSession().getRemoteMediaClient();
         if (remoteMediaClient == null) {
             //displayAlertMessage("Unable to get remote media client");
             return;

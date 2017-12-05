@@ -10,6 +10,7 @@ import com.google.android.gms.cast.framework.media.NotificationOptions;
 
 import net.ericsson.emovs.cast.R;
 import net.ericsson.emovs.cast.ui.activities.ExpandedControlsActivity;
+import net.ericsson.emovs.utilities.emp.EMPRegistry;
 
 import java.util.List;
 
@@ -36,9 +37,8 @@ public class CastOptionsProvider implements OptionsProvider {
                 .setExpandedControllerActivityClassName(ExpandedControlsActivity.class.getName())
                 .build();
 
-        // TODO: refactor this app_id to be configurable
         return new CastOptions.Builder()
-                .setReceiverApplicationId(context.getString(R.string.app_id))
+                .setReceiverApplicationId(EMPRegistry.chromecastAppId())
                 .setCastMediaOptions(mediaOptions)
                 .build();
     }
