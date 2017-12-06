@@ -1,4 +1,4 @@
-package net.ericsson.emovs.cast;
+package net.ericsson.emovs.cast.models;
 /*
  * Copyright (c) 2017 Ericsson. All Rights Reserved
  *
@@ -12,6 +12,8 @@ package net.ericsson.emovs.cast;
  */
 
 import android.text.TextUtils;
+
+import net.ericsson.emovs.cast.models.EmpExposureSettings;
 
 import org.json.JSONException;
 import org.json.JSONObject;

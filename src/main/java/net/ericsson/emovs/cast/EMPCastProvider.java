@@ -1,20 +1,31 @@
 package net.ericsson.emovs.cast;
 
+import android.content.Intent;
 import android.net.Uri;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaStatus;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 
+import net.ericsson.emovs.cast.interfaces.IEmpCastListener;
+import net.ericsson.emovs.cast.models.EmpCustomData;
+import net.ericsson.emovs.cast.models.EmpExposureSettings;
+import net.ericsson.emovs.cast.models.MediaTrack;
+import net.ericsson.emovs.cast.ui.activities.ExpandedControlsActivity;
 import net.ericsson.emovs.utilities.emp.EMPRegistry;
 import net.ericsson.emovs.utilities.interfaces.IPlayable;
 import net.ericsson.emovs.utilities.models.EmpAsset;
 import net.ericsson.emovs.utilities.models.EmpChannel;
 import net.ericsson.emovs.utilities.models.EmpImage;
 import net.ericsson.emovs.utilities.models.EmpProgram;
+
+import java.util.List;
+
+import static com.google.android.gms.cast.MediaStatus.PLAYER_STATE_UNKNOWN;
 
 /**
  * Created by Joao Coelho on 2017-12-04.
@@ -23,6 +34,7 @@ import net.ericsson.emovs.utilities.models.EmpProgram;
 public class EMPCastProvider {
     private CastContext castContext;
     private EmpReceiverChannel empReceiverChannel;
+    private EmptyEmpCastListener startCastingListener;
 
     private static class EMPCastProviderHolder {
         private final static EMPCastProvider sInstance = new EMPCastProvider();
@@ -37,29 +49,45 @@ public class EMPCastProvider {
         this.empReceiverChannel = EmpReceiverChannel.getSharedInstance(this.castContext);
     }
 
-    public CastSession getCastSession() {
+    public CastContext getCastContext() {
+        return this.castContext;
+    }
+
+    public CastSession getCurrentCastSession() {
         return this.castContext.getSessionManager().getCurrentCastSession();
     }
 
     // TODO: missing to pass castProperties
     public void startCasting(IPlayable playable, final Runnable onReady) {
-        if (this.getCastSession() == null) {
+        if (this.getCurrentCastSession() == null) {
             // TODO: return error
             return;
         }
 
-        final RemoteMediaClient remoteMediaClient = this.getCastSession().getRemoteMediaClient();
+        final RemoteMediaClient remoteMediaClient = this.getCurrentCastSession().getRemoteMediaClient();
         if (remoteMediaClient == null) {
             //displayAlertMessage("Unable to get remote media client");
             return;
         }
 
-        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+        if (this.startCastingListener != null) {
+            empReceiverChannel.removeListener(startCastingListener);
+        }
+
+        startCastingListener = new EmptyEmpCastListener() {
             @Override
-            public void onStatusUpdated() {
+            public void onTracksUpdated(List<MediaTrack> audioTracks, List<MediaTrack> subtitleTracks) {
                 if (onReady != null) {
                     onReady.run();
                 }
+            }
+        };
+
+        empReceiverChannel.addListener(startCastingListener);
+
+        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+            @Override
+            public void onStatusUpdated() {
                 empReceiverChannel.refreshControls();
 
                 // Chromecast API does not handle this well, se we are using a custom message for now.
@@ -121,6 +149,11 @@ public class EMPCastProvider {
         return this.empReceiverChannel;
     }
 
+    public void showExpandedControls() {
+        Intent intent = new Intent(EMPRegistry.applicationContext(), ExpandedControlsActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        EMPRegistry.applicationContext().startActivity(intent);
+    }
+
     private MediaInfo buildMediaInfo(IPlayable playable) {
         MediaMetadata movieMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
         MediaInfo.Builder builder;
@@ -146,7 +179,6 @@ public class EMPCastProvider {
 
             EmpImage image = channel.localized.getImage(locale, EmpImage.Orientation.LANDSCAPE);
             if (image != null && image.url != null) {
-
                 movieMetadata.addImage(new WebImage(Uri.parse(image.url)));
             }
 

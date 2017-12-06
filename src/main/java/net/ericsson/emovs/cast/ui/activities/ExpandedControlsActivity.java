@@ -1,5 +1,6 @@
 package net.ericsson.emovs.cast.ui.activities;
 
+import android.util.Log;
 import android.view.Menu;
 
 import com.google.android.gms.cast.framework.CastButtonFactory;

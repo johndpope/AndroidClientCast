@@ -1,4 +1,4 @@
-package net.ebstv.emp.castsenderdemo;
+package net.ericsson.emovs.cast;
 
 import android.content.Context;
 

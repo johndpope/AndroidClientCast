@@ -12,6 +12,9 @@ import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import net.ericsson.emovs.cast.interfaces.IEmpCastListener;
+import net.ericsson.emovs.cast.models.MediaTrack;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +43,7 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
 
     private static volatile EmpReceiverChannel sEmpReceiverChannel;
 
-    private final Set<EmpCastListener> listeners = new HashSet<>();
+    private final Set<IEmpCastListener> listeners = new HashSet<>();
     private CastSession mCastSession;
 
     private EmpReceiverChannel(CastContext castContext) {
@@ -106,7 +109,7 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
                         }
                     }
 
-                    for (EmpCastListener listener: listeners ) {
+                    for (IEmpCastListener listener: listeners ) {
                         listener.onTracksUpdated(audioTracks, subtitleTracks);
                     }
                     break;
@@ -114,25 +117,25 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
                     JSONObject data = jsonMessage.getJSONObject("data");
                     int volume = data.getInt("volume");
                     boolean muted = data.getBoolean("muted");
-                    for (EmpCastListener listener: listeners ) {
+                    for (IEmpCastListener listener: listeners ) {
                         listener.onVolumeChanged(volume, muted);
                     }
                     break;
                 case "durationchange":
                     int duration = jsonMessage.getInt("data");
-                    for (EmpCastListener listener: listeners ) {
+                    for (IEmpCastListener listener: listeners ) {
                         listener.onDurationChange(duration);
                     }
                     break;
                 case "timeShiftEnabled":
                     boolean timeShiftEnabled = jsonMessage.getBoolean("data");
-                    for (EmpCastListener listener: listeners ) {
+                    for (IEmpCastListener listener: listeners ) {
                         listener.onTimeshiftEnabled(timeShiftEnabled);
                     }
                     break;
                 case "isLive":
                     boolean isLive = jsonMessage.getBoolean("data");
-                    for (EmpCastListener listener: listeners ) {
+                    for (IEmpCastListener listener: listeners ) {
                         listener.onLive(isLive);
                     }
                     break;
@@ -140,7 +143,7 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
                     JSONObject error = jsonMessage.getJSONObject("data");
                     String errorMessage = error.has("message") ? error.getString("message") : "";
                     String code = error.has("code") ? Integer.toString(error.getInt("code")) : "N/A";
-                    for (EmpCastListener listener: listeners) {
+                    for (IEmpCastListener listener: listeners) {
                         listener.onError(code, errorMessage);
                     }
                     break;
@@ -215,13 +218,13 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
                 );
     }
 
-    public void addListener(EmpCastListener listener){
+    public void addListener(IEmpCastListener listener){
         if(listener != null) {
             this.listeners.add(listener);
         }
     }
 
-    public void removeListener(EmpCastListener listener) {
+    public void removeListener(IEmpCastListener listener) {
         if(listener != null) {
             this.listeners.remove(listener);
         }

@@ -1,4 +1,4 @@
-package net.ericsson.emovs.cast;
+package net.ericsson.emovs.cast.interfaces;
 /*
  * Copyright (c) 2017 Ericsson. All Rights Reserved
  *
@@ -11,12 +11,14 @@ package net.ericsson.emovs.cast;
  * THE PRODUCT.
  */
 
+import net.ericsson.emovs.cast.models.MediaTrack;
+
 import java.util.List;
 
 /**
  * Callbacks triggered by EMP Chromecast communication channel
  */
-public interface EmpCastListener {
+public interface IEmpCastListener {
 
     /**
      * Triggered when the selected audio tracks change or when a sender app request it

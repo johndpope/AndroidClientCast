@@ -1,4 +1,4 @@
-package net.ericsson.emovs.cast;
+package net.ericsson.emovs.cast.models;
 /*
  * Copyright (c) 2017 Ericsson. All Rights Reserved
  *
