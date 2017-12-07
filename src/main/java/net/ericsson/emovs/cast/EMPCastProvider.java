@@ -40,23 +40,43 @@ public class EMPCastProvider {
         private final static EMPCastProvider sInstance = new EMPCastProvider();
     }
 
+    /**
+     *
+     * @return
+     */
     public static EMPCastProvider getInstance() {
         return EMPCastProvider.EMPCastProviderHolder.sInstance;
     }
 
+    /**
+     *
+     */
     public EMPCastProvider() {
         this.castContext = CastContext.getSharedInstance(EMPRegistry.applicationContext());
         this.empReceiverChannel = EmpReceiverChannel.getSharedInstance(this.castContext);
     }
 
+    /**
+     *
+     * @return
+     */
     public CastContext getCastContext() {
         return this.castContext;
     }
 
+    /**
+     *
+     * @return
+     */
     public CastSession getCurrentCastSession() {
         return this.castContext.getSessionManager().getCurrentCastSession();
     }
 
+    /**
+     *
+     * @param playable
+     * @param onReady
+     */
     // TODO: missing to pass castProperties
     public void startCasting(IPlayable playable, final Runnable onReady) {
         if (this.getCurrentCastSession() == null) {
@@ -89,25 +109,6 @@ public class EMPCastProvider {
             @Override
             public void onStatusUpdated() {
                 empReceiverChannel.refreshControls();
-
-                // Chromecast API does not handle this well, se we are using a custom message for now.
-                /*Log.d(TAG, "status idle reason updated to: " + remoteMediaClient.getIdleReason());
-                if(remoteMediaClient.getIdleReason() == MediaStatus.IDLE_REASON_ERROR) {
-                    JSONObject customData = remoteMediaClient.getMediaStatus().getCustomData();
-                    if (customData != null) {
-                        try {
-                            String errMessage = customData.has("message") ? customData.getString("message") : "";
-                            String errCode = customData.has("code") ? Integer.toString(customData.getInt("code")) : "N/A";
-                            displayAlertMessage(String.format("Chromecast Error > %s [code:%s]", errMessage, errCode));
-                        } catch (JSONException e) {
-                            displayAlertMessage("Unknown chromecast error");
-                            e.printStackTrace();
-                        }
-
-                    } else {
-                        displayAlertMessage("Unknown chromecast error");
-                    }
-                }*/
             }
 
             @Override
@@ -141,14 +142,17 @@ public class EMPCastProvider {
         remoteMediaClient.load(media, true, 0, customData.toJson());
     }
 
-    public void stopCasting() {
-
-    }
-
+    /**
+     *
+     * @return
+     */
     public EmpReceiverChannel getReceiverChannel() {
         return this.empReceiverChannel;
     }
 
+    /**
+     *
+     */
     public void showExpandedControls() {
         Intent intent = new Intent(EMPRegistry.applicationContext(), ExpandedControlsActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         EMPRegistry.applicationContext().startActivity(intent);

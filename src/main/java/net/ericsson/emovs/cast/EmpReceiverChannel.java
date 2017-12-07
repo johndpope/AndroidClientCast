@@ -55,16 +55,11 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
         connectMessageReceiver();
     }
 
-    private void connectMessageReceiver() {
-        if(null != mCastSession) {
-            try {
-                mCastSession.setMessageReceivedCallbacks(NAMESPACE, this);
-            } catch (IOException e) {
-                Log.e(TAG, "Error connecting message receiver", e);
-            }
-        }
-    }
-
+    /**
+     *
+     * @param castContext
+     * @return
+     */
     public static EmpReceiverChannel getSharedInstance(CastContext castContext) {
         if(null == sEmpReceiverChannel) {
             sEmpReceiverChannel = new EmpReceiverChannel(castContext);
@@ -72,6 +67,12 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
         return sEmpReceiverChannel;
     }
 
+    /**
+     *
+     * @param castDevice
+     * @param namespace
+     * @param message
+     */
     @Override
     public void onMessageReceived(CastDevice castDevice, String namespace, String message) {
         Log.d(TAG, "onMessageReceived: " + message);
@@ -153,6 +154,9 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
         }
     }
 
+    /**
+     *
+     */
     public void refreshControls() {
         try {
             JSONObject message = new JSONObject();
@@ -163,6 +167,10 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
         }
     }
 
+    /**
+     *
+     * @param language
+     */
     public void showTextTrack(String language) {
         try {
             JSONObject message = new JSONObject();
@@ -176,6 +184,9 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
         }
     }
 
+    /**
+     *
+     */
     public void hideTextTrack() {
         try {
             JSONObject message = new JSONObject();
@@ -186,6 +197,10 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
         }
     }
 
+    /**
+     *
+     * @param language
+     */
     public void selectAudioTrack(String language) {
         try {
             JSONObject message = new JSONObject();
@@ -196,6 +211,26 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
             sendMessage(message.toString());
         } catch (JSONException e) {
             Log.e(TAG, "Error while building message", e);
+        }
+    }
+
+    /**
+     *
+     * @param listener
+     */
+    public void addListener(IEmpCastListener listener){
+        if(listener != null) {
+            this.listeners.add(listener);
+        }
+    }
+
+    /**
+     *
+     * @param listener
+     */
+    public void removeListener(IEmpCastListener listener) {
+        if(listener != null) {
+            this.listeners.remove(listener);
         }
     }
 
@@ -218,15 +253,13 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
                 );
     }
 
-    public void addListener(IEmpCastListener listener){
-        if(listener != null) {
-            this.listeners.add(listener);
-        }
-    }
-
-    public void removeListener(IEmpCastListener listener) {
-        if(listener != null) {
-            this.listeners.remove(listener);
+    private void connectMessageReceiver() {
+        if(null != mCastSession) {
+            try {
+                mCastSession.setMessageReceivedCallbacks(NAMESPACE, this);
+            } catch (IOException e) {
+                Log.e(TAG, "Error connecting message receiver", e);
+            }
         }
     }
 

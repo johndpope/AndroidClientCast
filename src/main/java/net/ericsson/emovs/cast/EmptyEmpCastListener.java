@@ -6,9 +6,8 @@ import net.ericsson.emovs.cast.models.MediaTrack;
 import java.util.List;
 
 /**
- * Created by Joao Coelho on 2017-12-06.
+ * Empty class that implements IEmpCastListener just to avoid unnecessary and ugly code on the fronted side
  */
-
 public class EmptyEmpCastListener implements IEmpCastListener {
     @Override
     public void onTracksUpdated(List<MediaTrack> audioTracks, List<MediaTrack> subtitleTracks) {
