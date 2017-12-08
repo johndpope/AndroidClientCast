@@ -77,10 +77,11 @@ public class EMPCastProvider {
      * @param playable
      * @param onReady
      */
-    // TODO: missing to pass castProperties
-    public void startCasting(IPlayable playable, final Runnable onReady) {
+    public void startCasting(IPlayable playable, EmpCustomData customData, final Runnable onReady, final Runnable onError) {
         if (this.getCurrentCastSession() == null) {
-            // TODO: return error
+            if (onError != null) {
+                onError.run();
+            }
             return;
         }
 
@@ -99,6 +100,13 @@ public class EMPCastProvider {
             public void onTracksUpdated(List<MediaTrack> audioTracks, List<MediaTrack> subtitleTracks) {
                 if (onReady != null) {
                     onReady.run();
+                }
+            }
+
+            @Override
+            public void onError(String errorCode, String message) {
+                if (onError != null) {
+                    onError.run();
                 }
             }
         };
@@ -132,12 +140,26 @@ public class EMPCastProvider {
             }
         });
 
-        MediaInfo media = buildMediaInfo(playable);
-        EmpCustomData customData = new EmpCustomData(media.getContentId(), new EmpExposureSettings());
+        if (customData == null) {
+            customData = new EmpCustomData();
+        }
 
         if (playable instanceof EmpProgram) {
-            customData.setProgramId(((EmpProgram) playable).programId);
+            EmpProgram empProgram = (EmpProgram) playable;
+            customData.setProgramId(empProgram.programId);
+            customData.assetId = empProgram.assetId;
         }
+        else if (playable instanceof EmpAsset) {
+            EmpAsset empAsset = (EmpAsset) playable;
+            customData.assetId = empAsset.assetId;
+        }
+        else if (playable instanceof EmpChannel) {
+            EmpChannel empChannel = (EmpChannel) playable;
+            customData.assetId = empChannel.channelId;
+        }
+
+        MediaInfo media = buildMediaInfo(playable, customData);
+
 
         remoteMediaClient.load(media, true, 0, customData.toJson());
     }
@@ -158,33 +180,35 @@ public class EMPCastProvider {
         EMPRegistry.applicationContext().startActivity(intent);
     }
 
-    private MediaInfo buildMediaInfo(IPlayable playable) {
+    private MediaInfo buildMediaInfo(IPlayable playable, EmpCustomData customData) {
+        String locale = customData.locale;
+
         MediaMetadata movieMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+
+        movieMetadata.putString(MediaMetadata.KEY_TITLE, playable.getLocalized().getTitle(locale));
+        movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, playable.getLocalized().getDescriptions(locale));
+
+        EmpImage image;
+        if (customData.imageType != null) {
+            image = playable.getLocalized().getImage(locale, EmpImage.Orientation.LANDSCAPE, customData.imageType);
+        }
+        else {
+            image = playable.getLocalized().getImage(locale, EmpImage.Orientation.LANDSCAPE);
+        }
+
+        if (image != null && image.url != null) {
+            movieMetadata.addImage(new WebImage(Uri.parse(image.url)));
+        }
+
         MediaInfo.Builder builder;
-        String locale = EMPRegistry.locale();
+
 
         if (playable instanceof EmpAsset || playable instanceof EmpProgram) {
             EmpAsset asset = (EmpAsset) playable;
-            movieMetadata.putString(MediaMetadata.KEY_TITLE, asset.localized.getTitle(locale));
-            movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, asset.localized.getDescriptions(locale));
-
-            EmpImage image = asset.localized.getImage(locale, EmpImage.Orientation.LANDSCAPE);
-            if (image != null && image.url != null) {
-                movieMetadata.addImage(new WebImage(Uri.parse(image.url)));
-            }
-
             builder = new MediaInfo.Builder(asset.assetId);
         }
         else if (playable instanceof EmpChannel) {
             EmpChannel channel = (EmpChannel) playable;
-
-            movieMetadata.putString(MediaMetadata.KEY_TITLE, channel.localized.getTitle(locale));
-            movieMetadata.putString(MediaMetadata.KEY_SUBTITLE, channel.localized.getDescriptions(locale));
-
-            EmpImage image = channel.localized.getImage(locale, EmpImage.Orientation.LANDSCAPE);
-            if (image != null && image.url != null) {
-                movieMetadata.addImage(new WebImage(Uri.parse(image.url)));
-            }
 
             builder = new MediaInfo.Builder(channel.channelId);
         }
