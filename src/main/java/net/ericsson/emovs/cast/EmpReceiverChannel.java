@@ -43,6 +43,9 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
 
     private static volatile EmpReceiverChannel sEmpReceiverChannel;
 
+    public List<MediaTrack> audioTracks;
+    public List<MediaTrack> textTracks;
+
     private final Set<IEmpCastListener> listeners = new HashSet<>();
     private CastSession mCastSession;
 
@@ -113,6 +116,9 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
                     for (IEmpCastListener listener: listeners ) {
                         listener.onTracksUpdated(audioTracks, subtitleTracks);
                     }
+
+                    this.audioTracks = audioTracks;
+                    this.textTracks = subtitleTracks;
                     break;
                 case "volumechange":
                     JSONObject data = jsonMessage.getJSONObject("data");
