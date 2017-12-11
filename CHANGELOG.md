@@ -1,10 +1,9 @@
-# CHANGELOG
+# Release Notes
 
-* `0.67.x` Releases - [0.67.0](#010)
+## 2.XX.0
 
-## 0.67.0
-Released 12 Sep 2017
+### New features and Enhancements
+**EMP-XXXX** Added stuff
 
-#### Features
-* Adding DateTimeParser
-* Project created
+### Bug fixes
+**EMP-XXXX** Fixed stuff
