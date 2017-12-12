@@ -1,10 +1,9 @@
 package net.ericsson.emovs.cast.ui.activities;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
-import android.util.Log;
+
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,9 +53,12 @@ public class ExpandedControlsActivity extends ExpandedControllerActivity {
         ImageView ccBtn = geTracksButton();
 
         if (ccBtn != null) {
+            ccBtn.setEnabled(true);
+            ccBtn.setClickable(true);
             ccBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    new TrackSelectorFragment().show(getSupportFragmentManager(), "TrackSelection");
                 }
             });
             bindTrackSelectionFragment(ccBtn);
@@ -91,10 +93,10 @@ public class ExpandedControlsActivity extends ExpandedControllerActivity {
     }
 
     private void bindTrackSelectionFragment(ImageView  ccBtn) {
-        ViewGroup ccBtnHolder = (ViewGroup) ccBtn.getParent();
+        ViewGroup ccBtnHolder = (ViewGroup) ccBtn.getParent().getParent();
         TrackSelectorFragment fragment = new TrackSelectorFragment();
 
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
         ft.add(ccBtnHolder.getId(), fragment);
