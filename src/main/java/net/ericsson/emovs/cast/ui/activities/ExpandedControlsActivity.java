@@ -34,41 +34,35 @@ import java.util.List;
  */
 
 public class ExpandedControlsActivity extends ExpandedControllerActivity {
-    //IEmpCastListener empCastListener;
+    IEmpCastListener empCastListener;
     TrackSelectorFragment trackSelector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //if (this.empCastListener != null) {
-        //    EMPCastProvider.getInstance().getReceiverChannel().removeListener(this.empCastListener);
-        //}
-
-        //this.empCastListener = new EmptyEmpCastListener() {
-        //    @Override
-        //    public void onTracksUpdated(List<MediaTrack> audioTracks, List<MediaTrack> subtitleTracks) {
-        //    }
-        //};
-
-        this.trackSelector = new TrackSelectorFragment();
-        ImageView ccBtn = geTracksButton();
-
-        if (ccBtn != null) {
-            ccBtn.setEnabled(true);
-            ccBtn.setClickable(true);
-            ccBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (trackSelector != null) {
-                        trackSelector.show(getSupportFragmentManager(), "TrackSelection");
-                    }
-                }
-            });
-            bindTrackSelectionFragment(ccBtn);
+        if (this.empCastListener != null) {
+            EMPCastProvider.getInstance().getReceiverChannel().removeListener(this.empCastListener);
         }
 
-        //EMPCastProvider.getInstance().getReceiverChannel().addListener(this.empCastListener);
+        this.empCastListener = new EmptyEmpCastListener() {
+            @Override
+            public void onTracksUpdated(List<MediaTrack> audioTracks, List<MediaTrack> subtitleTracks) {
+                if (audioTracks.size() > 1 || subtitleTracks.size() > 0) {
+                    bindTrackSelectionButton();
+                }
+                else {
+                    ImageView ccBtn = geTracksButton();
+                    if (ccBtn != null) {
+                        ccBtn.setEnabled(false);
+                        ccBtn.setClickable(false);
+                    }
+                }
+            }
+        };
+
+        bindTrackSelectionButton();
+        EMPCastProvider.getInstance().getReceiverChannel().addListener(this.empCastListener);
     }
 
     @Override
@@ -79,13 +73,13 @@ public class ExpandedControlsActivity extends ExpandedControllerActivity {
         return true;
     }
 
-    //@Override
-    //protected void onDestroy() {
-        //super.onDestroy();
-        //if (this.empCastListener != null) {
-        //    EMPCastProvider.getInstance().getReceiverChannel().removeListener(this.empCastListener);
-        //}
-    //}
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (this.empCastListener != null) {
+            EMPCastProvider.getInstance().getReceiverChannel().removeListener(this.empCastListener);
+        }
+    }
 
     private ImageView geTracksButton() {
         for (int i = 0; i < getButtonSlotCount(); ++i) {
@@ -105,5 +99,27 @@ public class ExpandedControlsActivity extends ExpandedControllerActivity {
 
         ft.add(ccBtnHolder.getId(), fragment);
         ft.commit();
+    }
+
+    private void bindTrackSelectionButton() {
+        if (this.trackSelector == null) {
+            this.trackSelector = new TrackSelectorFragment();
+        }
+
+        ImageView ccBtn = geTracksButton();
+
+        if (ccBtn != null) {
+            ccBtn.setEnabled(true);
+            ccBtn.setClickable(true);
+            ccBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (trackSelector != null) {
+                        trackSelector.show(getSupportFragmentManager(), "TrackSelection");
+                    }
+                }
+            });
+            bindTrackSelectionFragment(ccBtn);
+        }
     }
 }

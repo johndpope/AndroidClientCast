@@ -63,7 +63,9 @@ public class TrackSelectorFragment extends DialogFragment {
                     }
                 });
 
-        return builder.create();
+        Dialog dialog = builder.create();
+        bindReceiverTrackSelection((AlertDialog) dialog);
+        return dialog;
     }
 
     private void unselectOlderTracks(AlertDialog dialog, int which) {
@@ -101,8 +103,6 @@ public class TrackSelectorFragment extends DialogFragment {
             }
         }
 
-        // empReceiverChannel.hideTextTrack();
-
         for (int i = 0; i < empReceiverChannel.textTracks.size(); ++i) {
             if (this.selectedItems[empReceiverChannel.audioTracks.size() + i]) {
                 empReceiverChannel.showTextTrack(empReceiverChannel.textTracks.get(i).getLanguage());
@@ -130,5 +130,31 @@ public class TrackSelectorFragment extends DialogFragment {
         }
 
         return trackNames.toArray(new CharSequence[trackNames.size()]);
+    }
+
+    private void bindReceiverTrackSelection(AlertDialog dialog) {
+        EmpReceiverChannel empReceiverChannel = EMPCastProvider.getInstance().getReceiverChannel();
+        ListView dialogItems = dialog.getListView();
+
+        int n = 0;
+        if (empReceiverChannel.audioTracks != null) {
+            for (MediaTrack track : empReceiverChannel.audioTracks) {
+                if (track.isActive()) {
+                    this.selectedItems[n] = true;
+                    dialogItems.setItemChecked(n, true);
+                }
+                ++n;
+            }
+        }
+
+        if (empReceiverChannel.textTracks != null) {
+            for (MediaTrack track : empReceiverChannel.textTracks) {
+                if (track.isActive()) {
+                    this.selectedItems[n] = true;
+                    dialogItems.setItemChecked(n, true);
+                }
+                ++n;
+            }
+        }
     }
 }
