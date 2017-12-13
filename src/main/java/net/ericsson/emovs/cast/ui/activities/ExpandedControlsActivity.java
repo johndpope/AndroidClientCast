@@ -35,6 +35,7 @@ import java.util.List;
 
 public class ExpandedControlsActivity extends ExpandedControllerActivity {
     //IEmpCastListener empCastListener;
+    TrackSelectorFragment trackSelector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class ExpandedControlsActivity extends ExpandedControllerActivity {
         //    }
         //};
 
+        this.trackSelector = new TrackSelectorFragment();
         ImageView ccBtn = geTracksButton();
 
         if (ccBtn != null) {
@@ -58,7 +60,9 @@ public class ExpandedControlsActivity extends ExpandedControllerActivity {
             ccBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new TrackSelectorFragment().show(getSupportFragmentManager(), "TrackSelection");
+                    if (trackSelector != null) {
+                        trackSelector.show(getSupportFragmentManager(), "TrackSelection");
+                    }
                 }
             });
             bindTrackSelectionFragment(ccBtn);
