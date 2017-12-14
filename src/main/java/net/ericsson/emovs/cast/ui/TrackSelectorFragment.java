@@ -15,6 +15,7 @@ import net.ericsson.emovs.cast.EmpReceiverChannel;
 import net.ericsson.emovs.cast.R;
 import net.ericsson.emovs.cast.models.MediaTrack;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -95,19 +96,38 @@ public class TrackSelectorFragment extends DialogFragment {
 
     private void selectReceiverTrack() {
         EmpReceiverChannel empReceiverChannel = EMPCastProvider.getInstance().getReceiverChannel();
+        boolean audioUsed = false, textUsed = false;
 
         for (int i = 0; i < empReceiverChannel.audioTracks.size(); ++i) {
             if (this.selectedItems[i]) {
                 empReceiverChannel.selectAudioTrack(empReceiverChannel.audioTracks.get(i).getLanguage());
+                audioUsed = true;
                 break;
             }
+        }
+
+        try {
+            if (audioUsed == false) {
+                EMPCastProvider.getInstance().getCurrentCastSession().setMute(true);
+            }
+            else {
+                EMPCastProvider.getInstance().getCurrentCastSession().setMute(false);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
 
         for (int i = 0; i < empReceiverChannel.textTracks.size(); ++i) {
             if (this.selectedItems[empReceiverChannel.audioTracks.size() + i]) {
                 empReceiverChannel.showTextTrack(empReceiverChannel.textTracks.get(i).getLanguage());
+                textUsed = true;
                 break;
             }
+        }
+
+        if (textUsed == false) {
+            empReceiverChannel.hideTextTrack();
         }
     }
 
