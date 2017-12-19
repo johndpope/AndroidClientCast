@@ -49,13 +49,15 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
     private final Set<IEmpCastListener> listeners = new HashSet<>();
     private CastSession mCastSession;
 
-    private EmpReceiverChannel(CastContext castContext) {
+    protected EmpReceiverChannel(CastContext castContext) {
         SessionManagerListenerImpl sessionManagerListener = new SessionManagerListenerImpl();
-        castContext.getSessionManager().addSessionManagerListener(
-                sessionManagerListener, CastSession.class);
+        if (castContext != null) {
+            castContext.getSessionManager().addSessionManagerListener(
+                    sessionManagerListener, CastSession.class);
 
-        mCastSession = castContext.getSessionManager().getCurrentCastSession();
-        connectMessageReceiver();
+            mCastSession = castContext.getSessionManager().getCurrentCastSession();
+            connectMessageReceiver();
+        }
     }
 
     /**
