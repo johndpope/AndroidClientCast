@@ -25,7 +25,7 @@ ext {
     releaseArtifact = 'empplayer-cast'
     releaseVersion = 'r2.72.0'
     releaseDescription = 'The EMP Player library cast module.'
-    libraryTag = 'r2.99.76'
+    libraryTag = 'master-SNAPSHOT'
 }
 
 android {
