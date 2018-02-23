@@ -36,6 +36,8 @@ public class EMPCastProvider {
     private EmpReceiverChannel empReceiverChannel;
     private EmptyEmpCastListener startCastingListener;
 
+    protected IPlayable playable;
+
     private static class EMPCastProviderHolder {
         private final static EMPCastProvider sInstance = new EMPCastProvider();
     }
@@ -147,7 +149,7 @@ public class EMPCastProvider {
         if (playable instanceof EmpProgram) {
             EmpProgram empProgram = (EmpProgram) playable;
             customData.setProgramId(empProgram.programId);
-            customData.assetId = empProgram.assetId;
+            customData.channelId = empProgram.channelId;
         }
         else if (playable instanceof EmpAsset) {
             EmpAsset empAsset = (EmpAsset) playable;
@@ -155,9 +157,10 @@ public class EMPCastProvider {
         }
         else if (playable instanceof EmpChannel) {
             EmpChannel empChannel = (EmpChannel) playable;
-            customData.assetId = empChannel.channelId;
+            customData.channelId = empChannel.channelId;
         }
 
+        this.playable = playable;
         MediaInfo media = buildMediaInfo(playable, customData);
 
         remoteMediaClient.load(media, true, 0, customData.toJson());

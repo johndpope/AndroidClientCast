@@ -14,6 +14,9 @@ import com.google.android.gms.common.api.Status;
 
 import net.ericsson.emovs.cast.interfaces.IEmpCastListener;
 import net.ericsson.emovs.cast.models.MediaTrack;
+import net.ericsson.emovs.utilities.metadata.EmpBaseBuilder;
+import net.ericsson.emovs.utilities.models.EmpAsset;
+import net.ericsson.emovs.utilities.models.EmpProgram;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,6 +48,8 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
 
     public List<MediaTrack> audioTracks;
     public List<MediaTrack> textTracks;
+    public EmpProgram currentProgram;
+    public Long referenceTime;
 
     private final Set<IEmpCastListener> listeners = new HashSet<>();
     private CastSession mCastSession;
@@ -86,6 +91,13 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
             JSONObject jsonMessage = new JSONObject(message);
 
             switch (jsonMessage.getString("type")) {
+                case "programchanged":
+                    JSONObject newProgramJson = jsonMessage.getJSONObject("data").getJSONObject("program");
+                    EmpBaseBuilder playableBuilder = new EmpBaseBuilder(null);
+                    currentProgram = new EmpProgram();
+                    playableBuilder.getProgram(newProgramJson, currentProgram);
+                    playableBuilder.getAsset(newProgramJson.getJSONObject("asset"), (EmpAsset) currentProgram, false);
+                    break;
                 case "tracksupdated":
                     List<MediaTrack> audioTracks = new ArrayList<>();
                     List<MediaTrack> subtitleTracks = new ArrayList<>();

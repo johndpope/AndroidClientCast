@@ -24,6 +24,7 @@ public class EmpCustomData {
     // These properties shall be sent to receiver
     public final EmpExposureSettings exposureSettings;
     public String assetId;
+    public String channelId;
     public String programId;
     public boolean useLastViewedOffset;
     public boolean timeshiftEnabled;
@@ -41,7 +42,6 @@ public class EmpCustomData {
     public EmpImage.Orientation imageOrientation;
 
     public EmpCustomData() {
-        this.assetId = assetId;
         this.exposureSettings = new EmpExposureSettings();
         this.timeshiftEnabled = true;
         this.useLastViewedOffset = false;
@@ -59,7 +59,12 @@ public class EmpCustomData {
         JSONObject customData = new JSONObject();
 
         try {
-            customData.put("assetId", assetId);
+            if (channelId != null) {
+                customData.put("channelId", channelId);
+            }
+            else {
+                customData.put("assetId", assetId);
+            }
 
             if(!TextUtils.isEmpty(programId)) {
                 customData.put("programId", programId);

@@ -1,5 +1,6 @@
 package net.ericsson.emovs.cast.ui.activities;
 
+import android.support.annotation.LayoutRes;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.os.Bundle;
@@ -63,6 +64,15 @@ public class ExpandedControlsActivity extends ExpandedControllerActivity {
 
         bindTrackSelectionButton();
         EMPCastProvider.getInstance().getReceiverChannel().addListener(this.empCastListener);
+    }
+
+    @Override
+    public void setContentView(@LayoutRes int layoutResID) {
+        if (layoutResID == R.layout.cast_expanded_controller_activity) {
+            getDelegate().setContentView(R.layout.emp_cast_expanded_controller_activity);
+            return;
+        }
+        getDelegate().setContentView(layoutResID);
     }
 
     @Override
