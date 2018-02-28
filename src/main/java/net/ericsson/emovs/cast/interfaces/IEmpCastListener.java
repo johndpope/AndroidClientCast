@@ -12,6 +12,9 @@ package net.ericsson.emovs.cast.interfaces;
  */
 
 import net.ericsson.emovs.cast.models.MediaTrack;
+import net.ericsson.emovs.utilities.models.EmpProgram;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -58,4 +61,8 @@ public interface IEmpCastListener {
      * @param message
      */
     void onError(String errorCode, String message);
+
+    void onProgramChanged(EmpProgram program);
+
+    void onEntitlementChange(JSONObject entitlementJson);
 }

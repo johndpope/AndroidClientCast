@@ -2,6 +2,9 @@ package net.ericsson.emovs.cast;
 
 import net.ericsson.emovs.cast.interfaces.IEmpCastListener;
 import net.ericsson.emovs.cast.models.MediaTrack;
+import net.ericsson.emovs.utilities.models.EmpProgram;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -36,6 +39,16 @@ public class EmptyEmpCastListener implements IEmpCastListener {
 
     @Override
     public void onError(String errorCode, String message) {
+
+    }
+
+    @Override
+    public void onProgramChanged(EmpProgram program) {
+
+    }
+
+    @Override
+    public void onEntitlementChange(JSONObject entitlementJson) {
 
     }
 }

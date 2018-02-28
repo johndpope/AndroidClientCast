@@ -91,12 +91,21 @@ public class EmpReceiverChannel implements Cast.MessageReceivedCallback {
             JSONObject jsonMessage = new JSONObject(message);
 
             switch (jsonMessage.getString("type")) {
+                case "entitlementchange":
+                    JSONObject entitlementJson = jsonMessage.getJSONObject("data").getJSONObject("entitlement");
+                    for (IEmpCastListener listener: listeners) {
+                        listener.onEntitlementChange(entitlementJson);
+                    }
+                    break;
                 case "programchanged":
                     JSONObject newProgramJson = jsonMessage.getJSONObject("data").getJSONObject("program");
                     EmpBaseBuilder playableBuilder = new EmpBaseBuilder(null);
                     currentProgram = new EmpProgram();
                     playableBuilder.getProgram(newProgramJson, currentProgram);
                     playableBuilder.getAsset(newProgramJson.getJSONObject("asset"), (EmpAsset) currentProgram, false);
+                    for (IEmpCastListener listener: listeners) {
+                        listener.onProgramChanged(currentProgram);
+                    }
                     break;
                 case "tracksupdated":
                     List<MediaTrack> audioTracks = new ArrayList<>();
